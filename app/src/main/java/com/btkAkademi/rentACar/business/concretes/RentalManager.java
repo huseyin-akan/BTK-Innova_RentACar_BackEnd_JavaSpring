@@ -111,5 +111,10 @@ public class RentalManager implements RentalService{
 	public DataResult<Car> getCarByRentalId(int id) {
 		var car = this.rentalDao.getById(id).getCar();
 		return new SuccessDataResult<Car>(car);
+	}
+
+	@Override
+	public DataResult<Rental> getRentalById(int id) {
+		return new SuccessDataResult<Rental>(this.rentalDao.getById(id));
 	}	
 }

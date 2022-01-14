@@ -15,5 +15,4 @@ public class CreatePaymentRequest implements IRequest {
 	private LocalDate paymentDate;
 	
 	private int rentalId;
-	private int additionalServiceId;
 }

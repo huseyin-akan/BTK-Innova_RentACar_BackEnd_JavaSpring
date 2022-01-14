@@ -1,5 +1,7 @@
 package com.btkAkademi.rentACar.business.concretes;
 
+import java.time.Period;
+
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
@@ -34,22 +36,27 @@ public class PaymentManager implements PaymentService {
 	public Result makePayment(CreatePaymentRequest request) {
 		
 		var payment = this.modelMapperService.forRequest().map(request, Payment.class);
-		payment.setTotalSum( calculateTotalSum(request.getRentalId(), request.getAdditionalServiceId()) );
+		payment.setTotalSum( calculateTotalSum(request.getRentalId() ) );
 		this.paymentDao.save(payment);
 		return new SuccessResult(Messages.PAYMENTSUCCESSFUL);		
 	}
 	
-	private double calculateTotalSum(int rentalId, int additionalServiceId) {
-		//TODO burayı DBden al.
-		var day = 3;
-		var car = this.rentalService.getCarByRentalId(rentalId).getData();
+	private double calculateTotalSum(int rentalId) {
+		var rental = this.rentalService.getRentalById(rentalId).getData();
+		var car = rental.getCar();
 		
+		var dayCount = Period.between(rental.getRentDate(), rental.getReturnDate()).getDays() + 1;
 		
 		var carPrice = car.getDailyPrice();
-		var rentalSum = day * carPrice ;
-		var additionalServiceSum = this.additionalServiceService.getSumByAdditionalServiceId(additionalServiceId);
+		var rentalSum = dayCount * carPrice ;
 		
-		return rentalSum + additionalServiceSum;
+		var additionalServices = this.additionalServiceService.getAdditionalServicesByRentalId(rentalId).getData();
+		
+		double additionalServicesSum = 0;
+		for(AdditionalService as : additionalServices) {
+			additionalServicesSum+= as.getTotalSum();
+		}		
+		return rentalSum + additionalServicesSum;
 	}	
 	
 }

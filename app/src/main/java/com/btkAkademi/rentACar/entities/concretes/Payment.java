@@ -36,8 +36,4 @@ public class Payment {
 	@OneToOne
 	@JoinColumn(name = "rental_id" )
 	private Rental rental;
-	
-	@OneToOne
-	@JoinColumn(name = "additionalService_id" )
-	private AdditionalService additionalService;
 }
