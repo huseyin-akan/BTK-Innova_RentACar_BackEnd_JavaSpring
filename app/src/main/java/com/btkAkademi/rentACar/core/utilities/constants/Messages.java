@@ -49,6 +49,7 @@ public class Messages {
 	public static final String ADDITIONALSERVICEADDED = "additional_serive.added";
 	public static final String CARMAINTENANCEUPDATED = "car.maintenace.updated";
 	public static final String PAYMENTSUCCESSFUL = "payment.successful";
+	public static final String WRONGCARDINFO = "wrong.card.info";
 	
 	
 		

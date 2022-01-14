@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
 import com.btkAkademi.rentACar.business.abstracts.PaymentService;
+import com.btkAkademi.rentACar.business.abstracts.PosSystemService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.requests.paymentRequests.CreatePaymentRequest;
+import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
+import com.btkAkademi.rentACar.core.utilities.helpers.CreditCardInfo;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
@@ -23,17 +26,27 @@ public class PaymentManager implements PaymentService {
 	private final ModelMapperService modelMapperService;
 	private final AdditionalServiceService additionalServiceService;
 	private final RentalService rentalService;
+	private final PosSystemService posSystemService;
 
 	public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService,
-			AdditionalServiceService additionalServiceService, RentalService rentalService) {
+			AdditionalServiceService additionalServiceService, RentalService rentalService, PosSystemService posSystemService) {
 		this.paymentDao = paymentDao;
 		this.modelMapperService = modelMapperService;
 		this.additionalServiceService = additionalServiceService;
 		this.rentalService = rentalService;
+		this.posSystemService = posSystemService;
 	}
 
 	@Override
 	public Result makePayment(CreatePaymentRequest request) {
+		
+		var result= BusinessRules.run(
+				checkIfCreditCardValid(request.getCardInfo())
+				);
+		
+		if(result != null) {
+			return result;
+		}
 		
 		var payment = this.modelMapperService.forRequest().map(request, Payment.class);
 		payment.setTotalSum( calculateTotalSum(request.getRentalId() ) );
@@ -45,7 +58,8 @@ public class PaymentManager implements PaymentService {
 		var rental = this.rentalService.getRentalById(rentalId).getData();
 		var car = rental.getCar();
 		
-		var dayCount = Period.between(rental.getRentDate(), rental.getReturnDate()).getDays() + 1;
+		var dayCount = Period.between(rental.getRentDate(), rental.getReturnDate()).getDays();
+		if(dayCount == 0) {dayCount=1;}
 		
 		var carPrice = car.getDailyPrice();
 		var rentalSum = dayCount * carPrice ;
@@ -59,4 +73,7 @@ public class PaymentManager implements PaymentService {
 		return rentalSum + additionalServicesSum;
 	}	
 	
+	private Result checkIfCreditCardValid(CreditCardInfo cardInfo) {
+		return this.posSystemService.checkIfCreditCardIsValid(cardInfo);
+	}
 }

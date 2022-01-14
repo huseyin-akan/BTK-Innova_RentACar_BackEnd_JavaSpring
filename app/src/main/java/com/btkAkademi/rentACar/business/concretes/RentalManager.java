@@ -102,8 +102,7 @@ public class RentalManager implements RentalService{
 	}
 	
 	public Result checkIfCarIsRented(int carId) {
-		//TODO returned date'e de bak.
-		var rental = this.rentalDao.findByCarId(carId);		
+		var rental = this.rentalDao.findByCarIdAndReturnDateIsNull(carId);		
 		return rental == null ? new SuccessResult() : new ErrorResult(Messages.CARISRENTED);
 	}
 
