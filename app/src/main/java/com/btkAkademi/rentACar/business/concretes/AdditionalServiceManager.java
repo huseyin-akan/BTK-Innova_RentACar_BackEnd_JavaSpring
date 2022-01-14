@@ -38,4 +38,10 @@ public class AdditionalServiceManager implements AdditionalServiceService{
 		return new SuccessResult(Messages.ADDITIONALSERVICEADDED);
 	}
 
+	@Override
+	public double getSumByAdditionalServiceId(int id) {
+		var additionalServiceSum = this.additionalServiceDao.getById(id).getTotalSum();
+		return additionalServiceSum;
+	}
+
 }

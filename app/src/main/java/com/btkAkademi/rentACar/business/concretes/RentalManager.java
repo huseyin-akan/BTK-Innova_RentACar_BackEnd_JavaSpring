@@ -14,10 +14,13 @@ import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateRentalRequ
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
+import com.btkAkademi.rentACar.core.utilities.results.DataResult;
 import com.btkAkademi.rentACar.core.utilities.results.ErrorResult;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
+import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.RentalDao;
+import com.btkAkademi.rentACar.entities.concretes.Car;
 import com.btkAkademi.rentACar.entities.concretes.Rental;
 
 @Service
@@ -102,5 +105,11 @@ public class RentalManager implements RentalService{
 		//TODO returned date'e de bak.
 		var rental = this.rentalDao.findByCarId(carId);		
 		return rental == null ? new SuccessResult() : new ErrorResult(Messages.CARISRENTED);
+	}
+
+	@Override
+	public DataResult<Car> getCarByRentalId(int id) {
+		var car = this.rentalDao.getById(id).getCar();
+		return new SuccessDataResult<Car>(car);
 	}	
 }

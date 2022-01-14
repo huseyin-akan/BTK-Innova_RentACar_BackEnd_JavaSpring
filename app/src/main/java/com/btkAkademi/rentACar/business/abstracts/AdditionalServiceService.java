@@ -5,4 +5,6 @@ import com.btkAkademi.rentACar.core.utilities.results.Result;
 
 public interface AdditionalServiceService {
 	Result add(CreateAdditionalServiceRequest request);
+	
+	double getSumByAdditionalServiceId(int id);
 }

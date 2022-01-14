@@ -7,5 +7,5 @@ import com.btkAkademi.rentACar.entities.concretes.AdditionalService;
 
 @Repository
 public interface AdditionalServiceDao extends JpaRepository<AdditionalService, Integer>{
-	
+
 }
