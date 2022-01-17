@@ -20,7 +20,6 @@ public class CreateIndividualRentalRequest implements IRequest {
 	private int rentedCityId;
 	private int returnedCityId;
 	
-	private String code;
 	private int customerId;
 	private int carId;
 }

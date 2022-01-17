@@ -18,4 +18,5 @@ public class CreatePaymentRequest implements IRequest {
 	private boolean saveRequested;
 	private CreateCreditCardInfoRequest createCreditCardInfoRequest;
 	private int rentalId;
+	private String code;
 }

@@ -55,8 +55,7 @@ public class RentalManager implements RentalService{
 				checkIfCarExists(request.getCarId() ),
 				checkIfCarIsAvailableToRent(request.getCarId()),
 				checkIfIndividualFindexScoreIsEnough(request.getCustomerId(), request.getCarId() ),
-				checkIfAgeIsEnoughToRent(request.getCustomerId(), request.getCarId()),
-				checkIfPromotionCodeValid(request.getCode())
+				checkIfAgeIsEnoughToRent(request.getCustomerId(), request.getCarId())
 				);
 		
 		if(result != null) {
@@ -70,14 +69,14 @@ public class RentalManager implements RentalService{
 
 	@Override
 	public Result rentForCorporateCustomer(CreateCorporateRentalRequest request) {
+		
 		var result = BusinessRules.run(
 				checkIfKmIsValid(request.getRentedKilometer(), request.getReturnedKilometer()),
 				checkIfReturnDateIsValid(request.getRentDate(), request.getReturnDate()),
 				checkIfCustomerIsValid(request.getCustomerId()),
 				checkIfCarExists(request.getCarId() ),
 				checkIfCarIsAvailableToRent(request.getCarId()),
-				checkIfCorporateFindexScoreIsEnough(request.getCustomerId(), request.getCarId() ),
-				checkIfPromotionCodeValid(request.getCode())
+				checkIfCorporateFindexScoreIsEnough(request.getCustomerId(), request.getCarId() )
 				);
 		
 		if(result != null) {
@@ -89,22 +88,6 @@ public class RentalManager implements RentalService{
 		return new SuccessResult(Messages.RENTALADDED);
 	}
 	
-	private Result checkIfPromotionCodeValid(String code) {
-		var result = this.promotionCodeService.getPromotionCodeByCode(code);
-		if(!result.isSuccess()) {
-			return result;
-		}
-		
-		var promotionCode = result.getData();
-		
-		if(!Period.between(promotionCode.getEndDate(), LocalDate.now()).isNegative() ) {
-			return new ErrorResult(Messages.CODEEXPIRED);
-		}else if( Period.between(promotionCode.getStartDate(), LocalDate.now()).isNegative() ) {
-			return new ErrorResult(Messages.CODETIMENOTSTARTED);
-		}
-		
-		return new SuccessResult();
-	}
 	
 	private Result checkIfAgeIsEnoughToRent(int customerId, int carId) {
 		var customerBirthDate = this.individualCustomerService.getById(customerId).getData().getBirthDate();

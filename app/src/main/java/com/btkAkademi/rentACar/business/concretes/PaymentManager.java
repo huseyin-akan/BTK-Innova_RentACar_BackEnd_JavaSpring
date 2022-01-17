@@ -1,5 +1,6 @@
 package com.btkAkademi.rentACar.business.concretes;
 
+import java.time.LocalDate;
 import java.time.Period;
 
 import org.springframework.stereotype.Service;
@@ -8,12 +9,14 @@ import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
 import com.btkAkademi.rentACar.business.abstracts.CreditCardInfoService;
 import com.btkAkademi.rentACar.business.abstracts.PaymentService;
 import com.btkAkademi.rentACar.business.abstracts.PosSystemService;
+import com.btkAkademi.rentACar.business.abstracts.PromotionCodeService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.requests.creditCardInfoRequest.CreateCreditCardInfoRequest;
 import com.btkAkademi.rentACar.business.requests.paymentRequests.CreatePaymentRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
+import com.btkAkademi.rentACar.core.utilities.results.ErrorResult;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.PaymentDao;
@@ -21,7 +24,10 @@ import com.btkAkademi.rentACar.entities.concretes.AdditionalService;
 import com.btkAkademi.rentACar.entities.concretes.CreditCardInfo;
 import com.btkAkademi.rentACar.entities.concretes.Payment;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class PaymentManager implements PaymentService {
 	
 	private final PaymentDao paymentDao;
@@ -30,26 +36,18 @@ public class PaymentManager implements PaymentService {
 	private final RentalService rentalService;
 	private final PosSystemService posSystemService;
 	private final CreditCardInfoService creditCardInfoService;
+	private final PromotionCodeService promotionCodeService;
 
-
-
-	public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService,
-			AdditionalServiceService additionalServiceService, RentalService rentalService,
-			PosSystemService posSystemService, CreditCardInfoService creditCardInfoService) {
-		this.paymentDao = paymentDao;
-		this.modelMapperService = modelMapperService;
-		this.additionalServiceService = additionalServiceService;
-		this.rentalService = rentalService;
-		this.posSystemService = posSystemService;
-		this.creditCardInfoService = creditCardInfoService;
-	}
 
 	@Override
 	public Result makePayment(CreatePaymentRequest request) {
 		
+		var promotionCode = request.getCode();
+		
 		var result= BusinessRules.run(
 				//TODO burayı düzelt.
 				//checkIfCreditCardValid(request.getCreateCreditCardInfoRequest() )
+				checkIfPromotionCodeValid(promotionCode)
 				);
 		
 		if(result != null) {
@@ -61,12 +59,24 @@ public class PaymentManager implements PaymentService {
 			//this.creditCardInfoService.saveCard(card);
 		}
 		
+		
 		var payment = this.modelMapperService.forRequest().map(request, Payment.class);
-		payment.setTotalSum( calculateTotalSum(request.getRentalId() ) );
+		var sum = calculateTotalSum(request.getRentalId());
+
+		
+		var promotionCodeObj = this.promotionCodeService.getPromotionCodeByCode(promotionCode).getData();
+		System.out.println(promotionCodeObj);
+		if(promotionCodeObj != null) {
+			byte discountRate = promotionCodeObj.getDiscountRate();
+			sum = sum - (sum * discountRate / 100) ;
+		}
+		
+		payment.setTotalSum(sum);
 		this.paymentDao.save(payment);
 		return new SuccessResult(Messages.PAYMENTSUCCESSFUL);		
 	}
 	
+	//TODO promosyon kod işlemlerini buraya yedirelim.
 	private double calculateTotalSum(int rentalId) {
 		var rental = this.rentalService.getRentalById(rentalId).getData();
 		var car = rental.getCar();
@@ -89,4 +99,27 @@ public class PaymentManager implements PaymentService {
 	private Result checkIfCreditCardValid(CreditCardInfo cardInfo) {
 		return this.posSystemService.checkIfCreditCardIsValid(cardInfo);
 	}
+	
+	private Result checkIfPromotionCodeValid(String code) {
+		
+		if(code == null) {
+			return new SuccessResult();
+		}
+		
+		var result = this.promotionCodeService.getPromotionCodeByCode(code);
+		if(!result.isSuccess()) {
+			return result;
+		}
+		
+		var promotionCode = result.getData();
+		
+		if(!Period.between(promotionCode.getEndDate(), LocalDate.now()).isNegative() ) {
+			return new ErrorResult(Messages.CODEEXPIRED);
+		}else if( Period.between(promotionCode.getStartDate(), LocalDate.now()).isNegative() ) {
+			return new ErrorResult(Messages.CODETIMENOTSTARTED);
+		}
+		
+		return new SuccessResult();
+	}
+	
 }
