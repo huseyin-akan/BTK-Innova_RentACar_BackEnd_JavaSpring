@@ -137,6 +137,16 @@ public class CarManager implements CarService {
 		var car = this.carDao.findById(id);
 		return car.isPresent() ? new SuccessResult() : new ErrorResult(Messages.CARNOTFOUND);
 	}
+
+	@Override
+	public int getFindexScoreById(int id) {
+		return this.carDao.getFindexScoreById(id);
+	}
+	
+	@Override
+	public int getMinAgeById(int id) {
+		return this.carDao.getMinAgeById(id);
+	}
 	
 
 

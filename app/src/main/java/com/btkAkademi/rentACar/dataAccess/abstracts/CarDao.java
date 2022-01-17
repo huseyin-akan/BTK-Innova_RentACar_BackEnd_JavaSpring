@@ -29,4 +29,10 @@ public interface CarDao extends JpaRepository<Car, Integer> {
 //	@Query("Select new com.btkAkademi.rentACar.business.dtos.CarListDto(c.id, c.modelYear, c.description, c.kilometer) "
 //			+ " From Car c Inner Join c.rentals r"
 //			+ " where r.returnDate is null")
+	
+	
+	int getFindexScoreById(int carId);
+	
+	int getMinAgeById(int carıd);
+	
 }

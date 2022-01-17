@@ -50,13 +50,14 @@ public class Messages {
 	public static final String CARMAINTENANCEUPDATED = "car.maintenace.updated";
 	public static final String PAYMENTSUCCESSFUL = "payment.successful";
 	public static final String WRONGCARDINFO = "wrong.card.info";
-	
-	
-		
-	
-	
-	
-	
+	public static final String CARDADDED = "card.added";
+	public static final String FINDEXSCORENOTENOUGH = "findex.not.enoough";
+	public static final String CUSTOMERAGEISNOTENOUGH = "customer.age.not.enough";
+	public static final String INVOICEADDED = "invoice.added";
+	public static final String PROMOTIONCODEADDED = "promotion.code.added";
+	public static final String CODENOTFOUND = "code.not.found";
+	public static final String CODEEXPIRED = "code.expired";
+	public static final String CODETIMENOTSTARTED = "code.time.not.started";
 	
 	
 	

@@ -71,4 +71,16 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 		return new SuccessResult();
 	}
 
+	@Override
+	public String getNationalIdById(int customerId) {
+		var customer = this.individualCustomerDao.getById(customerId);
+		
+		return customer.getNationalId();
+	}
+
+	@Override
+	public DataResult<LocalDate> getBirthDateById(int customerId) {
+		return new SuccessDataResult<LocalDate>( this.individualCustomerDao.findBirthDateById(customerId) );
+	}
+
 }

@@ -11,4 +11,5 @@ import com.btkAkademi.rentACar.entities.concretes.CorporateCustomer;
 public interface CorporateCustomerDao extends JpaRepository<CorporateCustomer, Integer>{
 	Optional<CorporateCustomer> findByCompanyName(String companyName);
 	Optional<CorporateCustomer> findByEmail(String email);
+	int findTaxNumberById(int customerId);
 }

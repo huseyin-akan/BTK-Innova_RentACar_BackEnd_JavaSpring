@@ -10,4 +10,6 @@ public interface CorporateCustomerService {
 	Result addCustomer(CreateCorporateCustomerRequest corporateCustomerRequest);
 	
 	DataResult<CorporateCustomer> getById(int id);
+	
+	DataResult<String> getTaxNumberById(int customerId);
 }
