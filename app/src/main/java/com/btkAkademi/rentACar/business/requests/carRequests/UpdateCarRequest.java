@@ -20,4 +20,5 @@ public class UpdateCarRequest implements IRequest{
 	
 	private int brandId;
 	private int colorId;
+	private int carClassId;
 }

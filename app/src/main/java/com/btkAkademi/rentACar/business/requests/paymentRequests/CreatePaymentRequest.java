@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import com.btkAkademi.rentACar.business.requests.IRequest;
 import com.btkAkademi.rentACar.business.requests.creditCardInfoRequest.CreateCreditCardInfoRequest;
-import com.btkAkademi.rentACar.entities.concretes.CreditCardInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

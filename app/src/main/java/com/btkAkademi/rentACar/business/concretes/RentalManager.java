@@ -10,15 +10,16 @@ import com.btkAkademi.rentACar.business.abstracts.CarService;
 import com.btkAkademi.rentACar.business.abstracts.CorporateCustomerService;
 import com.btkAkademi.rentACar.business.abstracts.FindexScoreService;
 import com.btkAkademi.rentACar.business.abstracts.IndividualCustomerService;
-import com.btkAkademi.rentACar.business.abstracts.PromotionCodeService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateCorporateRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateIndividualRentalRequest;
-import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateRentalRequest;
+import com.btkAkademi.rentACar.business.requests.rentalRequests.EndCCRentalRequest;
+import com.btkAkademi.rentACar.business.requests.rentalRequests.EndICRentalRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
 import com.btkAkademi.rentACar.core.utilities.results.DataResult;
+import com.btkAkademi.rentACar.core.utilities.results.ErrorDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.ErrorResult;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
@@ -40,11 +41,7 @@ public class RentalManager implements RentalService{
 	private final CarMaintenanceService carMaintenanceService;
 	private final CarService carService;
 	private final FindexScoreService findexScoreService;
-	
-	public Result addRental(CreateRentalRequest request) {
-		return null;
-	}
-	
+		
 	@Override
 	public Result rentForIndividualCustomer(CreateIndividualRentalRequest request) {
 		
@@ -70,14 +67,42 @@ public class RentalManager implements RentalService{
 		if(	!checkIfCarIsAvailableToRent(car).isSuccess() || !checkIfCarIsRented(car).isSuccess()) {
 			System.out.println("müsaiit değil araba.");
 			
-			var newCarToRent = this.carService.getAnAvailableCarByClassId(car.getCarClass().getId()).getData();
-			rental.setCar(newCarToRent);
+			var newCarToRent = this.carService.getAnAvailableCarByClassId(car.getCarClass().getId());
+			if(!newCarToRent.isSuccess()) {
+				return new ErrorResult(Messages.NOCARTORENTINTHISCLASS);
+			}
+			rental.setCar(newCarToRent.getData());
 		}	
 		
 		this.rentalDao.save(rental);
 		return new SuccessResult(Messages.RENTALADDED);
 	}
-
+	
+	@Override
+	public Result endRentalProcessForIC(EndICRentalRequest request) {
+		
+		var rentalToCheck = this.getRentalById(request.getId());
+		if(!rentalToCheck.isSuccess()) {
+			return new ErrorResult(rentalToCheck.getMessage());
+		}
+		var rental = rentalToCheck.getData();
+		
+		var result = BusinessRules.run(
+				checkIfRentalCanBeEnded(rental),
+				checkIfKmIsValid(rental.getRentedKilometer(), request.getReturnedKm()),
+				checkIfReturnDateIsValid(rental.getRentDate(), request.getReturnedDate() )
+				);
+		
+		if(result != null) {
+			return result;
+		}
+		
+		rental.setReturnedKilometer(request.getReturnedKm());
+		rental.setReturnedDate(request.getReturnedDate());
+		this.rentalDao.save(rental);
+		return new SuccessResult(Messages.RENTENDSUCCESS);
+	}
+	
 	@Override
 	public Result rentForCorporateCustomer(CreateCorporateRentalRequest request) {
 		var car = this.carService.getCarById(request.getCarId() ).getData();
@@ -96,6 +121,12 @@ public class RentalManager implements RentalService{
 		var rental = this.modelMapperService.forRequest().map(request, Rental.class);
 		this.rentalDao.save(rental);
 		return new SuccessResult(Messages.RENTALADDED);
+	}
+
+	@Override
+	public Result endRentalProcessForCC(EndCCRentalRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
@@ -174,6 +205,13 @@ public class RentalManager implements RentalService{
 	public Result checkIfCarIsRented(Car car) {
 		var rental = this.rentalDao.findByCarIdAndReturnedDateIsNull(car.getId());		
 		return rental == null ? new SuccessResult() : new ErrorResult(Messages.CARISRENTED);
+	}	
+	
+	private Result checkIfRentalCanBeEnded(Rental rental) {
+		if(rental.getReturnedDate() != null) {
+			return new ErrorResult(Messages.CARISNOTRENTED);
+		}
+		return new SuccessResult();
 	}
 
 	@Override
@@ -184,8 +222,13 @@ public class RentalManager implements RentalService{
 
 	@Override
 	public DataResult<Rental> getRentalById(int id) {
-		return new SuccessDataResult<Rental>(this.rentalDao.getById(id));
+		var result = this.rentalDao.findById(id);		
+		return result.isEmpty() ? 
+				new ErrorDataResult<Rental>(Messages.NORENTALFOUND) :
+					new SuccessDataResult<Rental>(result.get());
 	}
+
+	
 
 		
 }

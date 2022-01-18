@@ -27,14 +27,16 @@ public class CarMaintenance {
     private int id;   
 
     @Column(name="maintenance_reason")
-    private String maintenanceReason;   
+    private String maintenanceReason; 
+    
+    @Column(name="maintenance_result")
+    private String maintenanceResult;
 
     @Column(name="start_date")
     private LocalDate startDate;   
 
     @Column(name="end_date")
-    private LocalDate returnDate;      
-
+    private LocalDate returnDate; 
     
     @ManyToOne
     @JoinColumn(name = "car_id" )

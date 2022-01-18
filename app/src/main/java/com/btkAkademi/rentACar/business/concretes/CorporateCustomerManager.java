@@ -17,7 +17,6 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 	private final ModelMapperService modelMapperService;	
 	
 	public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService) {
-		super();
 		this.corporateCustomerDao = corporateCustomerDao;
 		this.modelMapperService = modelMapperService;
 	}

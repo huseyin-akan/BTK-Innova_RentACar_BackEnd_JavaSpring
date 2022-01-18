@@ -11,6 +11,7 @@ import com.btkAkademi.rentACar.business.abstracts.BrandService;
 import com.btkAkademi.rentACar.business.abstracts.CarService;
 import com.btkAkademi.rentACar.business.abstracts.ColorService;
 import com.btkAkademi.rentACar.business.dtos.CarListDto;
+import com.btkAkademi.rentACar.business.dtos.CarListDtoProj;
 import com.btkAkademi.rentACar.business.requests.carRequests.CreateCarRequest;
 import com.btkAkademi.rentACar.business.requests.carRequests.UpdateCarRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
@@ -60,43 +61,50 @@ public class CarManager implements CarService {
 		return new SuccessDataResult<List<CarListDto>>(response, message);
 	}
 	
-	public DataResult<List<CarListDto>> getAllRentableCars() {
-		var carList = this.carDao.getAllRentableCars();
-		return new SuccessDataResult<List<CarListDto>>(carList);
+	public DataResult<List<CarListDtoProj>> getAllRentableCars() {
+		var carList = this.carDao.getAllAvailableCars();
+		if(carList.isEmpty()) {
+			return new ErrorDataResult<List<CarListDtoProj>>(Messages.NOCARTOLIST);
+		}
+		return new SuccessDataResult<List<CarListDtoProj>>(carList.get());
 	}
 	
-	public DataResult<List<CarListDto>> getRentableCars(){
-		return getRentableCars(1, 10);
+	public DataResult<List<CarListDtoProj>> getAllRentableCarsPaged(){
+		return getAllRentableCarsPaged(1, 10);
 	}
 	
-	public DataResult<List<CarListDto>> getRentableCars(int pageNo){
-		return getRentableCars(pageNo, 10);
+	public DataResult<List<CarListDtoProj>> getAllRentableCarsPaged(int pageNo){
+		return getAllRentableCarsPaged(pageNo, 10);
 	}
 	
-	public DataResult<List<CarListDto>> getRentableCars(int pageNo, int pageSize) {
+
+	public DataResult<List<CarListDtoProj>> getAllRentableCarsPaged(int pageNo, int pageSize) {
 		Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+		
+		var response = this.carDao.getAllAvailableCars(pageable);
+		
+		if(response.isEmpty()) {
+			return new ErrorDataResult<List<CarListDtoProj>>(Messages.NOCARTOLIST);
+		}
 		
 		String message = ((pageNo-1)*pageSize+1) + " ile " + ((pageNo-1)*pageSize+pageSize) 
 				+ " arası arabalar başarıyla döndürüldü.";
-		
-		var response = this.carDao.getAllRentableCars(pageable).stream()
-				.map(car -> modelMapperService.forDto()
-				.map(car, CarListDto.class))
-				.collect(Collectors.toList());
-		return new SuccessDataResult<List<CarListDto>>(response , message);
+				
+		return new SuccessDataResult<List<CarListDtoProj>>(response.get() , message);
 	}
 
-	public Result addCar(CreateCarRequest carCreateDto) {
+	public Result addCar(CreateCarRequest request) {
 		var result= BusinessRules.run(
-				checkIfBrandExists(carCreateDto.getBrandId() ),
-				checkIfColorExists(carCreateDto.getColorId())
+				checkIfBrandExists(request.getBrandId() ),
+				checkIfColorExists(request.getColorId())
 				);
 		
 		if(result != null) {
 			return result;
 		}
 		
-		var carToAdd = this.modelMapperService.forRequest().map(carCreateDto, Car.class);
+		var carToAdd = this.modelMapperService.forRequest().map(request, Car.class);
+		System.out.println(carToAdd);
 		this.carDao.save(carToAdd);
 		return new SuccessResult(Messages.CARADDSUCCESSFUL);
 	}
@@ -150,7 +158,13 @@ public class CarManager implements CarService {
 
 	@Override
 	public DataResult<Car> getAnAvailableCarByClassId(int classId) {
-		var car = this.carDao.getById( this.carDao.getAnAvailableCarIdByClassId(classId) );
+		
+		var newCar = this.carDao.getAnAvailableCarIdByClassId(classId);
+		if(newCar.isEmpty() ) {
+			return new ErrorDataResult<Car>(Messages.NOCARTORENTINTHISCLASS);
+		}
+		
+		var car = this.carDao.getById( newCar.get() );
 		return new SuccessDataResult<Car>(car);
 	}
 	

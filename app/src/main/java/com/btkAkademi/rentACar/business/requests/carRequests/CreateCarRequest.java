@@ -16,7 +16,9 @@ public class CreateCarRequest implements IRequest{
 	private String description;
 	private int kilometer;
 	private int findexScore;
+	private int minAge;
 	
 	private int brandId;
 	private int colorId;
+	private int carClassId;
 }

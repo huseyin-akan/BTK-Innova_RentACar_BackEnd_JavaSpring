@@ -58,6 +58,11 @@ public class Messages {
 	public static final String CODENOTFOUND = "code.not.found";
 	public static final String CODEEXPIRED = "code.expired";
 	public static final String CODETIMENOTSTARTED = "code.time.not.started";
+	public static final String NOCARTORENTINTHISCLASS = "no.car.in.this.class";
+	public static final String NOCARTOLIST = "no.car.to.list";
+	public static final String CARISNOTRENTED = "car.is.not.rented";
+	public static final String RENTENDSUCCESS = "rent.end.success";
+	public static final String NORENTALFOUND = "no.rental.found";
 	
 	
 	

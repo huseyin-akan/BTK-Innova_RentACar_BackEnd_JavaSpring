@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.btkAkademi.rentACar.business.abstracts.CarService;
 import com.btkAkademi.rentACar.business.dtos.CarListDto;
+import com.btkAkademi.rentACar.business.dtos.CarListDtoProj;
 import com.btkAkademi.rentACar.business.requests.carRequests.CreateCarRequest;
 import com.btkAkademi.rentACar.business.requests.carRequests.UpdateCarRequest;
 import com.btkAkademi.rentACar.core.utilities.results.DataResult;
@@ -39,24 +40,24 @@ public class CarsController {
 	}
 	
 	@GetMapping("getallrentablecars")
-	public ResponseEntity<DataResult<List<CarListDto>>> getAllRentableCars() {
+	public ResponseEntity<DataResult<List<CarListDtoProj>>> getAllRentableCars() {
 		return ResponseEntity.ok(carService.getAllRentableCars());
 	}
 	
 	@GetMapping("getrentablecars")
-	public ResponseEntity<DataResult<List<CarListDto>>> getRentableCars() {
-		return ResponseEntity.ok(carService.getRentableCars());
+	public ResponseEntity<DataResult<List<CarListDtoProj>>> getRentableCars() {
+		return ResponseEntity.ok(carService.getAllRentableCarsPaged());
 	}
 	
 	@GetMapping("getrentablecars/{pageNumber}")
-	public ResponseEntity<DataResult<List<CarListDto>>> getRentableCars(@PathVariable int pageNumber) {
-		return ResponseEntity.ok(carService.getRentableCars(pageNumber));
+	public ResponseEntity<DataResult<List<CarListDtoProj>>> getRentableCars(@PathVariable int pageNumber) {
+		return ResponseEntity.ok(carService.getAllRentableCarsPaged(pageNumber));
 	}
 	
 	@GetMapping("getrentablecars/{pageNumber}/{pageSize}")
-	public ResponseEntity<DataResult<List<CarListDto>>> getRentableCars(@PathVariable int pageNumber, @PathVariable int pageSize) 
+	public ResponseEntity<DataResult<List<CarListDtoProj>>> getRentableCars(@PathVariable int pageNumber, @PathVariable int pageSize) 
 	{
-		return ResponseEntity.ok(carService.getRentableCars(pageNumber, pageSize));
+		return ResponseEntity.ok(carService.getAllRentableCarsPaged(pageNumber, pageSize));
 	}
 	
 	@PostMapping("add")

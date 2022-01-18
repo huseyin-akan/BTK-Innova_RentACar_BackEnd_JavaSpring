@@ -2,7 +2,6 @@ package com.btkAkademi.rentACar.business.concretes;
 
 import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
@@ -21,7 +20,6 @@ import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.InvoiceDao;
-import com.btkAkademi.rentACar.entities.concretes.Car;
 import com.btkAkademi.rentACar.entities.concretes.Invoice;
 
 @Service

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateCorporateRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateIndividualRentalRequest;
-import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateRentalRequest;
+import com.btkAkademi.rentACar.business.requests.rentalRequests.EndICRentalRequest;
 
 @RestController
 @RequestMapping("api/rentals")
@@ -32,6 +32,12 @@ public class RentalsController {
 	@PostMapping("rentforindividual")
 	public ResponseEntity<?> rentForIndividual(@RequestBody CreateIndividualRentalRequest request){
 		var result = rentalService.rentForIndividualCustomer(request);		
+		return result.isSuccess() ? ResponseEntity.ok(result): ResponseEntity.badRequest().body(result);
+	}
+	
+	@PostMapping("endrentalforic")
+	public ResponseEntity<?> endRentalForIC(@RequestBody EndICRentalRequest request){
+		var result = rentalService.endRentalProcessForIC(request);		
 		return result.isSuccess() ? ResponseEntity.ok(result): ResponseEntity.badRequest().body(result);
 	}
 	

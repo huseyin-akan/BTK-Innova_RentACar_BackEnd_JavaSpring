@@ -25,7 +25,6 @@ import com.btkAkademi.rentACar.dataAccess.abstracts.CarMaintenanceDao;
 import com.btkAkademi.rentACar.entities.concretes.Car;
 import com.btkAkademi.rentACar.entities.concretes.CarMaintenance;
 
-import lombok.AllArgsConstructor;
 
 @Service
 public class CarMaintenanceManager implements CarMaintenanceService {
@@ -43,8 +42,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		this.modelMapperService = modelMapperService;
 		this.rentalService = rentalService;
 		this.carService = carService;
-	}
-	
+	}	
 
 	public Result sendToMaintenance(CreateCarMaintenanceRequest carMaintenanceRequest) {
 		
@@ -60,6 +58,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		}
 		
 		var maintenanceToAdd = this.modelMapperService.forRequest().map(carMaintenanceRequest, CarMaintenance.class);
+		System.out.println(maintenanceToAdd);
 		this.carMaintenanceDao.save(maintenanceToAdd);
 		return new SuccessResult(Messages.CARSENTTOMAINTENANCE);
 	}
@@ -78,6 +77,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 		}
 		
 		var maintenanceToAdd = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest, CarMaintenance.class);
+		System.out.println(maintenanceToAdd);
 		this.carMaintenanceDao.save(maintenanceToAdd);
 		return new SuccessResult(Messages.CARMAINTENANCEUPDATED);
 	}
