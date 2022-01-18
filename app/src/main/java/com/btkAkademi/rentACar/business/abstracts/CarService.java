@@ -24,4 +24,6 @@ public interface CarService {
 	DataResult<Car> getCarById(int id);
 	int getFindexScoreById(int id);
 	int getMinAgeById(int id);
+	
+	DataResult<Car> getAnAvailableCarByClassId(int classId);
 }

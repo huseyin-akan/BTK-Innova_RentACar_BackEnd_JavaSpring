@@ -40,7 +40,6 @@ public class RentalManager implements RentalService{
 	private final CarMaintenanceService carMaintenanceService;
 	private final CarService carService;
 	private final FindexScoreService findexScoreService;
-	private final PromotionCodeService promotionCodeService;
 	
 	public Result addRental(CreateRentalRequest request) {
 		return null;
@@ -48,12 +47,12 @@ public class RentalManager implements RentalService{
 	
 	@Override
 	public Result rentForIndividualCustomer(CreateIndividualRentalRequest request) {
+		
+		var car = this.carService.getCarById(request.getCarId() ).getData();
+		
 		var result = BusinessRules.run(
-				checkIfKmIsValid(request.getRentedKilometer(), request.getReturnedKilometer()),
-				checkIfReturnDateIsValid(request.getRentDate(), request.getReturnDate()),
 				checkIfCustomerIsValid(request.getCustomerId()),
 				checkIfCarExists(request.getCarId() ),
-				checkIfCarIsAvailableToRent(request.getCarId()),
 				checkIfIndividualFindexScoreIsEnough(request.getCustomerId(), request.getCarId() ),
 				checkIfAgeIsEnoughToRent(request.getCustomerId(), request.getCarId())
 				);
@@ -63,19 +62,30 @@ public class RentalManager implements RentalService{
 		}
 		
 		var rental = this.modelMapperService.forRequest().map(request, Rental.class);
+		
+		//if car is not available then give another car in the same class
+		System.out.println(checkIfCarIsAvailableToRent(car).isSuccess());
+		System.out.println(checkIfCarIsRented(car).isSuccess());
+		
+		if(	!checkIfCarIsAvailableToRent(car).isSuccess() || !checkIfCarIsRented(car).isSuccess()) {
+			System.out.println("müsaiit değil araba.");
+			
+			var newCarToRent = this.carService.getAnAvailableCarByClassId(car.getCarClass().getId()).getData();
+			rental.setCar(newCarToRent);
+		}	
+		
 		this.rentalDao.save(rental);
 		return new SuccessResult(Messages.RENTALADDED);
 	}
 
 	@Override
 	public Result rentForCorporateCustomer(CreateCorporateRentalRequest request) {
+		var car = this.carService.getCarById(request.getCarId() ).getData();
 		
 		var result = BusinessRules.run(
-				checkIfKmIsValid(request.getRentedKilometer(), request.getReturnedKilometer()),
-				checkIfReturnDateIsValid(request.getRentDate(), request.getReturnDate()),
 				checkIfCustomerIsValid(request.getCustomerId()),
 				checkIfCarExists(request.getCarId() ),
-				checkIfCarIsAvailableToRent(request.getCarId()),
+				checkIfCarIsAvailableToRent(car),
 				checkIfCorporateFindexScoreIsEnough(request.getCustomerId(), request.getCarId() )
 				);
 		
@@ -156,13 +166,13 @@ public class RentalManager implements RentalService{
 		return new SuccessResult(); 
 	}
 	
-	private Result checkIfCarIsAvailableToRent(int carId) {
-		var result = this.carMaintenanceService.checkIfCarUnderMaintenance(carId);		
+	private Result checkIfCarIsAvailableToRent(Car car) {
+		var result = this.carMaintenanceService.checkIfCarUnderMaintenance(car.getId());		
 		return result.isSuccess() ? new ErrorResult(Messages.CARISINMAINTENANCE)  : new SuccessResult();		
 	}
 	
-	public Result checkIfCarIsRented(int carId) {
-		var rental = this.rentalDao.findByCarIdAndReturnDateIsNull(carId);		
+	public Result checkIfCarIsRented(Car car) {
+		var rental = this.rentalDao.findByCarIdAndReturnedDateIsNull(car.getId());		
 		return rental == null ? new SuccessResult() : new ErrorResult(Messages.CARISRENTED);
 	}
 

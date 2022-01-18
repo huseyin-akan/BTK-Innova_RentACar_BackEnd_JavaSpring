@@ -13,10 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateCorporateRentalRequest implements IRequest
 {
-	private LocalDate rentDate;
-	private LocalDate returnDate;	
+	private LocalDate rentDate;	
 	private int rentedKilometer;	
-	private int returnedKilometer;
 	
 	private int rentedCityId;
 	private int returnedCityId;

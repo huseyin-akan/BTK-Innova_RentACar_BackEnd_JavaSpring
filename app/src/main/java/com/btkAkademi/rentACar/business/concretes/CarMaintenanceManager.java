@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.CarMaintenanceService;
+import com.btkAkademi.rentACar.business.abstracts.CarService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.dtos.CarMaintenanceListDto;
 import com.btkAkademi.rentACar.business.requests.carMaintenance.CreateCarMaintenanceRequest;
@@ -21,7 +22,10 @@ import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.CarMaintenanceDao;
+import com.btkAkademi.rentACar.entities.concretes.Car;
 import com.btkAkademi.rentACar.entities.concretes.CarMaintenance;
+
+import lombok.AllArgsConstructor;
 
 @Service
 public class CarMaintenanceManager implements CarMaintenanceService {
@@ -29,18 +33,26 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	private final CarMaintenanceDao carMaintenanceDao;
 	private final ModelMapperService modelMapperService;
 	private final RentalService rentalService;
+	private final CarService carService;
 	
+	@Lazy
 	@Autowired
-	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService, @Lazy RentalService rentalService) {
+	public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService,
+			 RentalService rentalService,  CarService carService) {
 		this.carMaintenanceDao = carMaintenanceDao;
 		this.modelMapperService = modelMapperService;
 		this.rentalService = rentalService;
+		this.carService = carService;
 	}
+	
 
 	public Result sendToMaintenance(CreateCarMaintenanceRequest carMaintenanceRequest) {
+		
+		var car = this.carService.getCarById(carMaintenanceRequest.getCarId()).getData();
+		
 		var result= BusinessRules.run(
 				checkIfPossibleToSendCarToMaintenance(carMaintenanceRequest.getCarId()),
-				checkIfCarIsRented(carMaintenanceRequest.getCarId())
+				checkIfCarIsRented(car)
 				);
 		
 		if(result != null) {
@@ -53,9 +65,12 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 	}
 
 	public Result updateCarMaintenance(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) {
+		
+		var car = this.carService.getCarById(updateCarMaintenanceRequest.getCarId()).getData();
+		
 		var result= BusinessRules.run(
 				checkIfCarUnderMaintenance(updateCarMaintenanceRequest.getCarId()),
-				checkIfCarIsRented(updateCarMaintenanceRequest.getCarId())
+				checkIfCarIsRented(car)
 				);
 		
 		if(result != null) {
@@ -86,9 +101,11 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 					new SuccessResult();
 	}
 	
-	private Result checkIfCarIsRented(int carId) {
-		return this.rentalService.checkIfCarIsRented(carId);
+	private Result checkIfCarIsRented(Car car) {
+		return this.rentalService.checkIfCarIsRented(car);
 	}
+
+
 	
 
 	

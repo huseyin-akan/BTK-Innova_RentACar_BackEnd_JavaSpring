@@ -147,6 +147,12 @@ public class CarManager implements CarService {
 	public int getMinAgeById(int id) {
 		return this.carDao.getMinAgeById(id);
 	}
+
+	@Override
+	public DataResult<Car> getAnAvailableCarByClassId(int classId) {
+		var car = this.carDao.getById( this.carDao.getAnAvailableCarIdByClassId(classId) );
+		return new SuccessDataResult<Car>(car);
+	}
 	
 
 

@@ -1,7 +1,5 @@
 package com.btkAkademi.rentACar.business.concretes;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.PromotionCodeService;
@@ -11,7 +9,6 @@ import com.btkAkademi.rentACar.core.utilities.constants.Messages;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
 import com.btkAkademi.rentACar.core.utilities.results.DataResult;
 import com.btkAkademi.rentACar.core.utilities.results.ErrorDataResult;
-import com.btkAkademi.rentACar.core.utilities.results.ErrorResult;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;

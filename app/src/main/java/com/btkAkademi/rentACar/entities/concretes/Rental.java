@@ -39,15 +39,15 @@ public class Rental {
 	@Column(name="returnDate")
 	private LocalDate returnDate;
 	
+	@Column(name="returned_date")
+	private LocalDate returnedDate;
+	
 	@Column(name="rentedKilometer")
 	private int rentedKilometer;
 	
 	@Column(name="returnedKilometer")
 	private int returnedKilometer;
-	
-	@Column(name="total_sum")
-	private double totalSum;
-	
+		
 	@ManyToOne
 	@JoinColumn(name="rented_city_id")
 	private City rentedCity;

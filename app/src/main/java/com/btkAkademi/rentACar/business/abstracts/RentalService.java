@@ -13,7 +13,7 @@ public interface RentalService {
 	Result addRental(CreateRentalRequest request);
 	Result rentForIndividualCustomer(CreateIndividualRentalRequest request);
 	Result rentForCorporateCustomer(CreateCorporateRentalRequest request);
-	Result checkIfCarIsRented(int carId);
+	Result checkIfCarIsRented(Car car);
 	
 	DataResult<Car> getCarByRentalId(int id);
 	DataResult<Rental> getRentalById(int id);

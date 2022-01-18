@@ -23,16 +23,23 @@ public interface CarDao extends JpaRepository<Car, Integer> {
 			+ " from Car ca left join Rental re on ca.id =re.car.id" 
 			+ " where re.returnDate is null")
 	List<CarListDto> getAllRentableCars(Pageable pageable);
-	
-	
-	
-//	@Query("Select new com.btkAkademi.rentACar.business.dtos.CarListDto(c.id, c.modelYear, c.description, c.kilometer) "
-//			+ " From Car c Inner Join c.rentals r"
-//			+ " where r.returnDate is null")
-	
+		
 	
 	int getFindexScoreById(int carId);
 	
 	int getMinAgeById(int carıd);
+	
+//	@Query("From Car c left join Rental r on c.id =r.car.id" 
+//			+ " where r.returnDate is not null and c.carClass.id=:classId")
+	
+	@Query(value= "select \r\n"
+			+ "	c.id\r\n"
+			+ "from cars c\r\n"
+			+ "left join car_maintenance m on c.id = m.car_id and m.end_date is null\r\n"
+			+ "left join rentals r on c.id = r.car_id and (r.return_date is null or r.return_date>NOW())\r\n"
+			+ "where c.car_class_id = ?1 and r.id is null\r\n"
+			+ "limit 1",
+			nativeQuery=true)
+	int getAnAvailableCarIdByClassId(int classId);
 	
 }
