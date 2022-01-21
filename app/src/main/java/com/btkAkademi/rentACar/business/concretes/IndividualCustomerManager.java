@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.IndividualCustomerService;
+import com.btkAkademi.rentACar.business.abstracts.UserService;
+import com.btkAkademi.rentACar.business.dtos.IndividualCustomerListDto;
 import com.btkAkademi.rentACar.business.requests.individualCustomerRequests.CreateIndividualCustomerRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
@@ -20,18 +22,16 @@ import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.IndividualCustomerDao;
 import com.btkAkademi.rentACar.entities.concretes.IndividualCustomer;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class IndividualCustomerManager implements IndividualCustomerService {
 
 	private final IndividualCustomerDao individualCustomerDao;
 	private final ModelMapperService modelMapperService;
+	private final UserService userService;
 
-	@Autowired
-	public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao,
-			ModelMapperService modelMapperService) {
-		this.individualCustomerDao = individualCustomerDao;
-		this.modelMapperService = modelMapperService;
-	}
 
 	public Result addIndividualCustomer(CreateIndividualCustomerRequest createIndividualCustomer) {
 		var result = BusinessRules.run(checkIfEmailExists(createIndividualCustomer.getEmail()),
@@ -81,6 +81,20 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 	@Override
 	public DataResult<LocalDate> getBirthDateById(int customerId) {
 		return new SuccessDataResult<LocalDate>( this.individualCustomerDao.findBirthDateById(customerId) );
+	}
+
+	@Override
+	public DataResult<IndividualCustomerListDto> getByEmail(String email) {
+		
+		
+		var result = this.userService.getByMail(email);
+		if(!result.isSuccess()) {
+			return new ErrorDataResult<IndividualCustomerListDto>(Messages.USERNOTFOUND);
+		}
+		System.out.println(result.getData() );
+		
+		var customer = this.modelMapperService.forDto().map(result.getData(), IndividualCustomerListDto.class);
+		return new SuccessDataResult<IndividualCustomerListDto>(customer);
 	}
 
 }

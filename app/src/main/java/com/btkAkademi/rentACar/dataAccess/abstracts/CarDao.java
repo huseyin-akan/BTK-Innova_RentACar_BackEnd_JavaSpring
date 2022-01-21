@@ -31,7 +31,7 @@ public interface CarDao extends JpaRepository<Car, Integer> {
 	Optional<Integer> getAnAvailableCarIdByClassId(int classId);
 	
 	@Query(value= "select \r\n"
-			+ "	c.id as id, c.model_year as modelYear, c.description as description, c.kilometer as kilometer, \r\n"
+			+ "	c.id as id, c.model_year as modelYear, c.description as description, c.kilometer as kilometer, c.daily_price as dailyPrice, \r\n"
 			+ "	b.name as brand, co.name as color, c.findex_score as findexScore, c.min_age as minAge, cc.class_type as carClass\r\n"
 			+ "from cars c\r\n"
 			+ "left join car_maintenance m on c.id = m.car_id and m.end_date is null\r\n"
@@ -44,7 +44,7 @@ public interface CarDao extends JpaRepository<Car, Integer> {
 	Optional<List<CarListDtoProj>> getAllAvailableCars();
 	
 	@Query(value= "select \r\n"
-			+ "	c.id as id, c.model_year as modelYear, c.description as description, c.kilometer as kilometer, \r\n"
+			+ "	c.id as id, c.model_year as modelYear, c.description as description, c.kilometer as kilometer, c.daily_price as dailyPrice, \r\n"
 			+ "	b.name as brand, co.name as color, c.findex_score as findexScore, c.min_age as minAge, cc.class_type as carClass\r\n"
 			+ "from cars c\r\n"
 			+ "left join car_maintenance m on c.id = m.car_id and m.end_date is null\r\n"
@@ -55,5 +55,18 @@ public interface CarDao extends JpaRepository<Car, Integer> {
 			+ "where r.id is null and m.id is null",
 			nativeQuery=true)
 	Optional<List<CarListDtoProj>> getAllAvailableCars(Pageable pageable);
+	
+	@Query(value= "select \r\n"
+			+ "	c.id as id, c.model_year as modelYear, c.description as description, c.kilometer as kilometer, c.daily_price as dailyPrice, \r\n"
+			+ "	b.name as brand, co.name as color, c.findex_score as findexScore, c.min_age as minAge, cc.class_type as carClass\r\n"
+			+ "from cars c\r\n"
+			+ "left join car_maintenance m on c.id = m.car_id and m.end_date is null\r\n"
+			+ "left join rentals r on c.id = r.car_id and (r.returned_date is null or r.returned_date>NOW())\r\n"
+			+ "left join brands b on b.id = c.brand_id\r\n"
+			+ "left join colors co on co.id = c.color_id\r\n"
+			+ "left join car_classes cc on c.car_class_id = cc.id\r\n"
+			+ "where r.id is null and m.id is null and c.id = ?1",
+			nativeQuery=true)
+	Optional<CarListDtoProj> getCarByCarId(int carId);
 	
 }

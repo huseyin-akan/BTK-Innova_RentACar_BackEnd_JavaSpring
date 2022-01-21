@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import com.btkAkademi.rentACar.core.utilities.results.DataResult;
 
 @RestController
 @RequestMapping("api/cars")
+@CrossOrigin
 public class CarsController {
 	private final CarService carService;
 
@@ -29,6 +31,10 @@ public class CarsController {
 		this.carService = carService;
 	}
 
+	@GetMapping("get/{id}")
+	public ResponseEntity<DataResult<CarListDtoProj>> getById(@PathVariable int id){
+		return ResponseEntity.ok(carService.getById(id));
+	}
 	@GetMapping("getall")
 	public ResponseEntity<DataResult<List<CarListDto>>> getAll() {
 		return ResponseEntity.ok(carService.getAll());

@@ -63,6 +63,7 @@ public class Messages {
 	public static final String CARISNOTRENTED = "car.is.not.rented";
 	public static final String RENTENDSUCCESS = "rent.end.success";
 	public static final String NORENTALFOUND = "no.rental.found";
+	public static final String USERNOTFOUND = "user.not.found";
 	
 	
 	

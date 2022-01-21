@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import com.btkAkademi.rentACar.core.utilities.results.DataResult;
 
 @RestController
 @RequestMapping("api/brands")
+@CrossOrigin
 public class BrandsController {
 	private final BrandService brandService;
 
@@ -30,12 +32,14 @@ public class BrandsController {
 
 	@GetMapping("getall")
 	public ResponseEntity<DataResult<List<BrandListDto>>> getAll() {
-		return ResponseEntity.ok(brandService.getAll());
+		var result = brandService.getAll();
+		return result.isSuccess() ? ResponseEntity.ok(result): ResponseEntity.badRequest().body(result);
 	}
 
 	@PostMapping("add")
 	public ResponseEntity<?> add(@RequestBody @Valid CreateBrandRequest brandCreateDto) {
-		return ResponseEntity.ok(brandService.add(brandCreateDto));
+		var result = brandService.add(brandCreateDto);
+		return result.isSuccess() ? ResponseEntity.ok(result): ResponseEntity.badRequest().body(result);
 	}
 
 	@PostMapping("update")

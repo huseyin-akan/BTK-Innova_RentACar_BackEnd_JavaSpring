@@ -23,6 +23,9 @@ public interface CarService {
 	Result addCar(CreateCarRequest carCreateDto);	
 	Result updateCar(UpdateCarRequest updateCarRequest);	
 	DataResult<Car> getCarById(int id);
+	
+	DataResult<CarListDtoProj> getById(int carId);
+	
 	int getFindexScoreById(int id);
 	int getMinAgeById(int id);
 	

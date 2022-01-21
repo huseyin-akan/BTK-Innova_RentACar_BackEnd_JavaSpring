@@ -167,6 +167,16 @@ public class CarManager implements CarService {
 		var car = this.carDao.getById( newCar.get() );
 		return new SuccessDataResult<Car>(car);
 	}
+
+	@Override
+	public DataResult<CarListDtoProj> getById(int carId) {
+		var car = this.carDao.getCarByCarId(carId);
+		if(car.isEmpty() ) {
+			return new ErrorDataResult<CarListDtoProj>(Messages.NOCARTOLIST);
+		}
+
+		return new SuccessDataResult<CarListDtoProj>(car.get());
+	}
 	
 
 
