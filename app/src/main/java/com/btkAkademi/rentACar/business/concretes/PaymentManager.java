@@ -5,7 +5,6 @@ import java.time.Period;
 
 import org.springframework.stereotype.Service;
 
-import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
 import com.btkAkademi.rentACar.business.abstracts.CreditCardInfoService;
 import com.btkAkademi.rentACar.business.abstracts.PaymentService;
 import com.btkAkademi.rentACar.business.abstracts.PosSystemService;
@@ -21,7 +20,6 @@ import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.PaymentDao;
 import com.btkAkademi.rentACar.entities.concretes.AdditionalService;
-import com.btkAkademi.rentACar.entities.concretes.CreditCardInfo;
 import com.btkAkademi.rentACar.entities.concretes.Payment;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +30,6 @@ public class PaymentManager implements PaymentService {
 	
 	private final PaymentDao paymentDao;
 	private final ModelMapperService modelMapperService;
-	private final AdditionalServiceService additionalServiceService;
 	private final RentalService rentalService;
 	private final PosSystemService posSystemService;
 	private final CreditCardInfoService creditCardInfoService;
@@ -45,8 +42,7 @@ public class PaymentManager implements PaymentService {
 		var promotionCode = request.getCode();
 		
 		var result= BusinessRules.run(
-				//TODO burayı düzelt.
-				//checkIfCreditCardValid(request.getCreateCreditCardInfoRequest() )
+				checkIfCreditCardValid(request.getCreateCreditCardInfoRequest() ),
 				checkIfPromotionCodeValid(promotionCode)
 				);
 		
@@ -54,21 +50,23 @@ public class PaymentManager implements PaymentService {
 			return result;
 		}
 		
+		//TODO eğer kart sistemde kayıtlı ise, kaydetmeye gerek yok. credit card serviste yazalım bunu.
 		if(request.isSaveRequested() ) {
-			//var card =this.modelMapperService.forDto().map(request.getCardInfo(), CreateCreditCardInfoRequest.class); 
-			//this.creditCardInfoService.saveCard(card);
-		}
-		
+			var card =this.modelMapperService.forDto().map(request.getCreateCreditCardInfoRequest(), CreateCreditCardInfoRequest.class); 
+			this.creditCardInfoService.saveCard(card);
+		}		
 		
 		var payment = this.modelMapperService.forRequest().map(request, Payment.class);
 		var sum = calculateTotalSum(request.getRentalId());
 
-		
-		var promotionCodeObj = this.promotionCodeService.getPromotionCodeByCode(promotionCode).getData();
-		System.out.println(promotionCodeObj);
-		if(promotionCodeObj != null) {
-			byte discountRate = promotionCodeObj.getDiscountRate();
-			sum = sum - (sum * discountRate / 100) ;
+		if(promotionCode == null || promotionCode == "") {
+			
+		}else {
+			var promotionCodeObj = this.promotionCodeService.getPromotionCodeByCode(promotionCode).getData();
+			if(promotionCodeObj != null) {
+				byte discountRate = promotionCodeObj.getDiscountRate();
+				sum = sum - (sum * discountRate / 100) ;
+			}
 		}
 		
 		payment.setTotalSum(sum);
@@ -87,16 +85,16 @@ public class PaymentManager implements PaymentService {
 		var carPrice = car.getDailyPrice();
 		var rentalSum = dayCount * carPrice ;
 		
-		var additionalServices = this.additionalServiceService.getAdditionalServicesByRentalId(rentalId).getData();
+		var additionalServices = rental.getAdditionalServices();
 		
 		double additionalServicesSum = 0;
 		for(AdditionalService as : additionalServices) {
-			additionalServicesSum+= as.getTotalSum();
+			additionalServicesSum+= as.getPrice();
 		}		
 		return rentalSum + additionalServicesSum;
 	}	
 	
-	private Result checkIfCreditCardValid(CreditCardInfo cardInfo) {
+	private Result checkIfCreditCardValid(CreateCreditCardInfoRequest cardInfo) {
 		return this.posSystemService.checkIfCreditCardIsValid(cardInfo);
 	}
 	

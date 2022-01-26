@@ -13,7 +13,7 @@ public class CreateCreditCardInfoRequest implements IRequest{
 
 	private String creditCard;
 	private String validDate;	
-	private String cVC;	
+	private String cvc;	
 	private String cardHolder;
 	private int customerId;
 }

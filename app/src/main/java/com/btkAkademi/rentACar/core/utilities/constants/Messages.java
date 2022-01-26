@@ -1,5 +1,7 @@
 package com.btkAkademi.rentACar.core.utilities.constants;
 
+import com.btkAkademi.rentACar.business.dtos.InvoiceListDtoProj;
+
 public class Messages {
 
 	//BRAND ENTITY
@@ -64,6 +66,8 @@ public class Messages {
 	public static final String RENTENDSUCCESS = "rent.end.success";
 	public static final String NORENTALFOUND = "no.rental.found";
 	public static final String USERNOTFOUND = "user.not.found";
+	public static final String ADDITIONALSERVICENOTFOUND = "Ek servis bulunamadı";
+	public static final String NOINVOICEFOUND = "Fatura bulunamadı";
 	
 	
 	

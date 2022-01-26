@@ -1,5 +1,6 @@
 package com.btkAkademi.rentACar.business.abstracts;
 
+import com.btkAkademi.rentACar.business.dtos.RentalListDto;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateCorporateRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateIndividualRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.EndCCRentalRequest;
@@ -21,4 +22,5 @@ public interface RentalService {
 	//TODO car'ı get etme işlemini car service yapmalı.
 	DataResult<Car> getCarByRentalId(int id);
 	DataResult<Rental> getRentalById(int id);
+	DataResult<RentalListDto> getLastRentalByCustomerId(int customerId);
 }

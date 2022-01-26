@@ -1,14 +1,18 @@
 package com.btkAkademi.rentACar.entities.concretes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -68,6 +72,11 @@ public class Rental {
 	@JoinColumn(name="invoice_id")
 	private Invoice invoice;
 	
-	@OneToMany(mappedBy = "rental")
-	private List<AdditionalService> additionalServices;
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@JoinTable(
+	            name = "rentals_additional_services",
+	            joinColumns = @JoinColumn(name = "rental_id"),
+	            inverseJoinColumns = @JoinColumn(name = "additional_service_id")
+	)
+    private List<AdditionalService> additionalServices = new ArrayList<>();	
 }

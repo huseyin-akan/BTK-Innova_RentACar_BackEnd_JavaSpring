@@ -32,7 +32,7 @@ public class CreditCardInfo {
 	private String validDate;
 	
 	@Column(name="cvc")
-	private String cVC;	
+	private String cvc;	
 	
 	@Column(name="card_holder")
 	private String cardHolder;

@@ -30,6 +30,9 @@ public class Car {
 	@Column(name = "daily_price")
 	private double dailyPrice;
 	
+	@Column(name= "image_url")
+	private String imageUrl;	
+	
 	@Column(name = "model_year")
 	private int modelYear;
 	
@@ -48,6 +51,10 @@ public class Car {
 	@ManyToOne
 	@JoinColumn(name="brand_id")
 	private Brand brand;
+	
+	@ManyToOne
+	@JoinColumn(name="model_id")
+	private Model model;
 	
 	@ManyToOne
 	@JoinColumn(name="color_id")

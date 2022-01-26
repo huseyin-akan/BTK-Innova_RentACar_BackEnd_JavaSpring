@@ -5,12 +5,14 @@ import java.time.Period;
 
 import org.springframework.stereotype.Service;
 
+import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
 import com.btkAkademi.rentACar.business.abstracts.CarMaintenanceService;
 import com.btkAkademi.rentACar.business.abstracts.CarService;
 import com.btkAkademi.rentACar.business.abstracts.CorporateCustomerService;
 import com.btkAkademi.rentACar.business.abstracts.FindexScoreService;
 import com.btkAkademi.rentACar.business.abstracts.IndividualCustomerService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
+import com.btkAkademi.rentACar.business.dtos.RentalListDto;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateCorporateRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.CreateIndividualRentalRequest;
 import com.btkAkademi.rentACar.business.requests.rentalRequests.EndCCRentalRequest;
@@ -25,6 +27,7 @@ import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
 import com.btkAkademi.rentACar.dataAccess.abstracts.RentalDao;
+import com.btkAkademi.rentACar.entities.concretes.AdditionalService;
 import com.btkAkademi.rentACar.entities.concretes.Car;
 import com.btkAkademi.rentACar.entities.concretes.Rental;
 
@@ -41,6 +44,7 @@ public class RentalManager implements RentalService{
 	private final CarMaintenanceService carMaintenanceService;
 	private final CarService carService;
 	private final FindexScoreService findexScoreService;
+	private final AdditionalServiceService additionalService;
 		
 	@Override
 	public Result rentForIndividualCustomer(CreateIndividualRentalRequest request) {
@@ -60,12 +64,17 @@ public class RentalManager implements RentalService{
 		
 		var rental = this.modelMapperService.forRequest().map(request, Rental.class);
 		
+		//Many to Many relation için kayıt
+		AdditionalService additionalService;
+		for(Integer asId :request.getAdditionalServices()) {
+			additionalService = this.additionalService.getAdditionalServiceById(asId).getData();
+			additionalService.getRentals().add(rental);
+			rental.getAdditionalServices().add(additionalService);			
+		}
+		
 		//if car is not available then give another car in the same class
-		System.out.println(checkIfCarIsAvailableToRent(car).isSuccess());
-		System.out.println(checkIfCarIsRented(car).isSuccess());
 		
 		if(	!checkIfCarIsAvailableToRent(car).isSuccess() || !checkIfCarIsRented(car).isSuccess()) {
-			System.out.println("müsaiit değil araba.");
 			
 			var newCarToRent = this.carService.getAnAvailableCarByClassId(car.getCarClass().getId());
 			if(!newCarToRent.isSuccess()) {
@@ -226,6 +235,16 @@ public class RentalManager implements RentalService{
 		return result.isEmpty() ? 
 				new ErrorDataResult<Rental>(Messages.NORENTALFOUND) :
 					new SuccessDataResult<Rental>(result.get());
+	}
+
+	@Override
+	public DataResult<RentalListDto> getLastRentalByCustomerId(int customerId) {
+		var result = this.rentalDao.getLastRentalByCustomerId(customerId);
+		if(result == null) {
+			return new ErrorDataResult<RentalListDto>(Messages.NORENTALFOUND);
+		}
+		var mappedResult = this.modelMapperService.forDto().map(result, RentalListDto.class);
+		return new SuccessDataResult<RentalListDto>(mappedResult);
 	}
 
 	

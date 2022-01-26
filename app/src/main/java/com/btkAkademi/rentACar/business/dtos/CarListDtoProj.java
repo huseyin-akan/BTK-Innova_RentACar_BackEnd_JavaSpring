@@ -7,6 +7,8 @@ public interface CarListDtoProj {
 	int getKilometer();
 	int getDailyPrice();
 	String getBrand();
+	String getModelName();
+	String getImageUrl();
 	String getColor();
 	int getFindexScore();
 	int getMinAge();

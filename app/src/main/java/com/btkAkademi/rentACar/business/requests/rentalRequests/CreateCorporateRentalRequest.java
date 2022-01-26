@@ -1,6 +1,7 @@
 package com.btkAkademi.rentACar.business.requests.rentalRequests;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.btkAkademi.rentACar.business.requests.IRequest;
 
@@ -22,4 +23,6 @@ public class CreateCorporateRentalRequest implements IRequest
 	private String code;
 	private int customerId;
 	private int carId;
+	
+	private List<Integer> additionalServices;
 }

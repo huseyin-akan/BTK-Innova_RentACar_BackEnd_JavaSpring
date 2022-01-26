@@ -6,6 +6,6 @@ public class FakeKKBManager {
 	
 	public int getFindexScore() {
 		Random rand = new Random();
-		return rand.nextInt(50); 
+		return rand.nextInt(1000); 
 	}	
 }
