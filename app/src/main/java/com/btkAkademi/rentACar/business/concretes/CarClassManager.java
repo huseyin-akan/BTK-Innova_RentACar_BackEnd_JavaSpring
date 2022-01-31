@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.CarClassService;
 import com.btkAkademi.rentACar.business.dtos.CarClassListDto;
-import com.btkAkademi.rentACar.business.dtos.CarListDto;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
 import com.btkAkademi.rentACar.core.utilities.results.DataResult;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessDataResult;

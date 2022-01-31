@@ -2,12 +2,7 @@ package com.btkAkademi.rentACar.business.concretes;
 
 import org.springframework.stereotype.Service;
 
-import com.btkAkademi.rentACar.business.abstracts.AdditionalServiceService;
-import com.btkAkademi.rentACar.business.abstracts.CarService;
-import com.btkAkademi.rentACar.business.abstracts.CorporateCustomerService;
-import com.btkAkademi.rentACar.business.abstracts.IndividualCustomerService;
 import com.btkAkademi.rentACar.business.abstracts.InvoiceService;
-import com.btkAkademi.rentACar.business.abstracts.RentalService;
 import com.btkAkademi.rentACar.business.dtos.InvoiceListDtoProj;
 import com.btkAkademi.rentACar.business.requests.invoiceRequests.CreateInvoiceRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
@@ -28,11 +23,6 @@ import lombok.AllArgsConstructor;
 public class InvoiceManager implements InvoiceService{
 	private final InvoiceDao invoiceDao;
 	private final ModelMapperService modelMapperService;
-	private final RentalService rentalService;
-	private final IndividualCustomerService individualCustomerService;
-	private final CorporateCustomerService corporateCustomerService;
-	private final CarService carService;
-	private final AdditionalServiceService additionalServiceService;
 
 	@Override
 	public DataResult<InvoiceListDtoProj> getInvoiceByRentalId(int rentalId) {

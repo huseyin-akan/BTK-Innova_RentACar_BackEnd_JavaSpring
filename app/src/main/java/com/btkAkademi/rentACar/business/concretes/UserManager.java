@@ -33,7 +33,7 @@ public class UserManager implements UserService{
 	public DataResult<User> getByMail(String mail) {
 		var result = this.userDao.findByEmail(mail);
 		if(result.isEmpty()) {
-			return new ErrorDataResult(Messages.USERNOTFOUND);
+			return new ErrorDataResult<>(Messages.USERNOTFOUND);
 		}
 		return new SuccessDataResult<User>(result.get());
 	}

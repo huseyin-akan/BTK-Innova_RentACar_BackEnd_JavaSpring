@@ -26,12 +26,21 @@ public class AdditionalService {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="id")
 	private int id;
+	
+	@Column(name="service_name")
+	private String serviceName;
 		
 	@Column(name="description")
 	private String description;
 	
+	@Column(name = "imageUrl")
+	private String imageUrl;
+	
 	@Column(name="price")
 	private double price;
+	
+	@Column(name = "service_point")
+	private byte servicePoint;
 		
 	@ManyToMany(mappedBy = "additionalServices")
     private List<Rental> rentals = new ArrayList<>();

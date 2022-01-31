@@ -1,7 +1,5 @@
 package com.btkAkademi.rentACar.core.utilities.constants;
 
-import com.btkAkademi.rentACar.business.dtos.InvoiceListDtoProj;
-
 public class Messages {
 
 	//BRAND ENTITY

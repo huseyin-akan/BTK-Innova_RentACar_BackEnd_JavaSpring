@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateAdditionalServiceRequest {
 	private String description;
-	private double totalSum;
-	private int rentalId;
+	private double price;
+	private String serviceName;
+	private String imageUrl;
+	private byte servicePoint;
 }

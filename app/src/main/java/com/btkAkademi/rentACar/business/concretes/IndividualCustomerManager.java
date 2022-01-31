@@ -3,7 +3,6 @@ package com.btkAkademi.rentACar.business.concretes;
 import java.time.LocalDate;
 import java.time.Period;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.IndividualCustomerService;

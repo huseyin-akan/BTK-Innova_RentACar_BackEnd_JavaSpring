@@ -6,15 +6,19 @@ import java.time.Period;
 import org.springframework.stereotype.Service;
 
 import com.btkAkademi.rentACar.business.abstracts.CreditCardInfoService;
+import com.btkAkademi.rentACar.business.abstracts.InvoiceService;
 import com.btkAkademi.rentACar.business.abstracts.PaymentService;
 import com.btkAkademi.rentACar.business.abstracts.PosSystemService;
 import com.btkAkademi.rentACar.business.abstracts.PromotionCodeService;
 import com.btkAkademi.rentACar.business.abstracts.RentalService;
+import com.btkAkademi.rentACar.business.dtos.InvoiceListDtoProj;
 import com.btkAkademi.rentACar.business.requests.creditCardInfoRequest.CreateCreditCardInfoRequest;
 import com.btkAkademi.rentACar.business.requests.paymentRequests.CreatePaymentRequest;
 import com.btkAkademi.rentACar.core.utilities.business.BusinessRules;
 import com.btkAkademi.rentACar.core.utilities.constants.Messages;
 import com.btkAkademi.rentACar.core.utilities.mapping.ModelMapperService;
+import com.btkAkademi.rentACar.core.utilities.results.DataResult;
+import com.btkAkademi.rentACar.core.utilities.results.ErrorDataResult;
 import com.btkAkademi.rentACar.core.utilities.results.ErrorResult;
 import com.btkAkademi.rentACar.core.utilities.results.Result;
 import com.btkAkademi.rentACar.core.utilities.results.SuccessResult;
@@ -34,10 +38,10 @@ public class PaymentManager implements PaymentService {
 	private final PosSystemService posSystemService;
 	private final CreditCardInfoService creditCardInfoService;
 	private final PromotionCodeService promotionCodeService;
-
+	private final InvoiceService invoiceService;
 
 	@Override
-	public Result makePayment(CreatePaymentRequest request) {
+	public DataResult<InvoiceListDtoProj> makePayment(CreatePaymentRequest request) {
 		
 		var promotionCode = request.getCode();
 		
@@ -47,7 +51,7 @@ public class PaymentManager implements PaymentService {
 				);
 		
 		if(result != null) {
-			return result;
+			return new ErrorDataResult<InvoiceListDtoProj>(result.getMessage());
 		}
 		
 		//TODO eğer kart sistemde kayıtlı ise, kaydetmeye gerek yok. credit card serviste yazalım bunu.
@@ -71,7 +75,8 @@ public class PaymentManager implements PaymentService {
 		
 		payment.setTotalSum(sum);
 		this.paymentDao.save(payment);
-		return new SuccessResult(Messages.PAYMENTSUCCESSFUL);		
+		
+		return this.invoiceService.getInvoiceByRentalId(request.getRentalId() );		
 	}
 	
 	//TODO promosyon kod işlemlerini buraya yedirelim.
@@ -83,7 +88,6 @@ public class PaymentManager implements PaymentService {
 		if(dayCount == 0) {dayCount=1;}
 		
 		var carPrice = car.getDailyPrice();
-		var rentalSum = dayCount * carPrice ;
 		
 		var additionalServices = rental.getAdditionalServices();
 		
@@ -91,7 +95,7 @@ public class PaymentManager implements PaymentService {
 		for(AdditionalService as : additionalServices) {
 			additionalServicesSum+= as.getPrice();
 		}		
-		return rentalSum + additionalServicesSum;
+		return (carPrice + additionalServicesSum)*dayCount;
 	}	
 	
 	private Result checkIfCreditCardValid(CreateCreditCardInfoRequest cardInfo) {

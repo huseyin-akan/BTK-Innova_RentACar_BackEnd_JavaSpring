@@ -11,4 +11,7 @@ public class AdditionalServiceListDto {
 	private int id;
 	private String description;
 	private double price;
+	private String serviceName;
+	private String imageUrl;
+	private byte servicePoint;
 }

@@ -1,9 +1,6 @@
 package com.btkAkademi.rentACar.business.dtos;
 
 import java.time.LocalDate;
-import java.util.List;
-
-import com.btkAkademi.rentACar.entities.concretes.AdditionalService;
 
 public interface InvoiceListDtoProj extends IDto{
 	String getFirstName();

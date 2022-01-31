@@ -2,28 +2,29 @@ package com.btkAkademi.rentACar.ws.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.btkAkademi.rentACar.business.abstracts.PaymentService;
-import com.btkAkademi.rentACar.business.requests.paymentRequests.CreatePaymentRequest;
+import com.btkAkademi.rentACar.business.abstracts.InvoiceService;
 import com.btkAkademi.rentACar.core.utilities.results.ErrorDataResult;
 
+
 @RestController
-@RequestMapping("api/payments")
+@RequestMapping("api/invoices")
 @CrossOrigin
-public class PaymentsController {
+public class InvoicesController {
 	
-	private final PaymentService paymentService;
-	public PaymentsController(PaymentService paymentService) {
-		this.paymentService = paymentService;
+	private final InvoiceService invoiceService;
+	
+	public InvoicesController(InvoiceService invoiceService) {
+		this.invoiceService = invoiceService;
 	}
 	
-	@PostMapping("pay")
-	public ResponseEntity<?> makePayment(@RequestBody CreatePaymentRequest request){
-		var result = paymentService.makePayment(request);
+	@PostMapping("pay/{rentalId}")
+	public ResponseEntity<?> getInvoiceById(@PathVariable int rentalId){
+		var result = invoiceService.getInvoiceByRentalId(rentalId);
 		if(result.isSuccess() ) {
 			return ResponseEntity.ok(result);
 		}
